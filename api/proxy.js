@@ -14,8 +14,12 @@ module.exports = async (req, res) => {
     target: targetUrl,
     changeOrigin: true,
     pathRewrite: { '^/.*$': '' }, 
+    
+    // LINHAS NOVAS PARA CORRIGIR A CONEXÃO:
+    secure: true, // Força a verificação HTTPS
+    followRedirects: true, // Garante que a proxy siga redirecionamentos (importante para logins)
+
     onProxyReq: (proxyReq) => {
-      // Configuração para parecer um navegador normal
       proxyReq.setHeader('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36');
     },
     onError: (err, req, res) => {
