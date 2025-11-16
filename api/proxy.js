@@ -11,8 +11,15 @@ module.exports = async (req, res) => {
   }
 
   const apiProxy = createProxyMiddleware({
-    target: targetUrl,
-    changeOrigin: true,
+    // Definimos o target como uma URL base, o middleware lida com o resto
+    target: targetUrl, 
+    
+    // Isso é essencial: informa ao proxy para usar o host do destino, não o do Vercel
+    changeOrigin: true, 
+    
+    // Removemos a manipulação manual do Host Header, pois o changeOrigin deve ser suficiente:
+    // **REMOVIDO: onProxyReq: (proxyReq) => { ... proxyReq.setHeader('Host', targetHost); ... }**
+
     pathRewrite: { '^/.*$': '' }, 
     
     // Configurações de conexão para máxima compatibilidade:
@@ -21,16 +28,11 @@ module.exports = async (req, res) => {
     rejectUnauthorized: false, 
 
     onProxyReq: (proxyReq) => {
+      // Configura User-Agent
       proxyReq.setHeader('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36');
-      
-      try {
-        const targetHost = new URL(targetUrl).host;
-        proxyReq.setHeader('Host', targetHost);
-      } catch (e) { }
     },
     
-    // BLOCO ONERROR REMOVIDO AQUI!
-    
+    // MANTEMOS O BLOCO ONERROR REMOVIDO PARA EVITAR MENSAGENS, FORÇANDO O TIMEOUT PADRÃO.
   });
 
   apiProxy(req, res);
