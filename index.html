@@ -7,8 +7,8 @@
 
     <style>
         body {
-            /* LINK SVG CORRIGIDO E SIMPLIFICADO: */
-            background-image: url('https://raw.githubusercontent.com/scratchernotfounded/Browser_Grifenix/main/Background.svg'); 
+            /* LINK SVG COM CORREÇÃO DE CARREGAMENTO (?raw=true): */
+            background-image: url('https://raw.githubusercontent.com/scratchernotfounded/Browser_Grifenix/main/Background.svg?raw=true'); 
             background-size: cover;
             background-repeat: no-repeat;
             background-attachment: fixed;
@@ -30,9 +30,10 @@
             max-width: 600px;
             text-align: center;
         }
-        /* Corrigindo o espaçamento do título (h2) */
-        .browser-frame h2 { 
-            margin-top: 0;
+        /* Corrigindo o espaçamento do parágrafo (p) */
+        .browser-frame p { 
+            margin-top: 0; /* Remove o espaço superior indesejado */
+            margin-bottom: 15px; /* Mantém um pequeno espaço antes da barra de busca */
         }
         .address-bar {
             display: flex;
@@ -64,7 +65,7 @@
 </head>
 <body>
     <div class="browser-frame">
-        <h2>Acesso Seguro e Criptografado (Sem Bloqueios de Escola)</h2> 
+        <p>Acesso Seguro e Criptografado (Sem Bloqueios de Escola)</p> 
         
         <div class="address-bar">
             <input type="text" id="urlInput" placeholder="Digite a URL do jogo (ex: https://sitedojogo.com)">
