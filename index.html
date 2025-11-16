@@ -7,11 +7,13 @@
 
     <style>
         body {
-            /* LINK SVG COM CORREÇÃO DE CARREGAMENTO (?raw=true): */
+            /* LINK SVG CORRIGIDO E AGORA POSICIONADO 10% PARA CIMA: */
             background-image: url('https://raw.githubusercontent.com/scratchernotfounded/Browser_Grifenix/main/Background.svg?raw=true'); 
             background-size: cover;
             background-repeat: no-repeat;
             background-attachment: fixed;
+            background-position: center top 10%; /* Move o fundo para cima */
+            
             display: flex;
             justify-content: center;
             align-items: center;
@@ -30,10 +32,11 @@
             max-width: 600px;
             text-align: center;
         }
-        /* Corrigindo o espaçamento do parágrafo (p) */
+        /* Corrigindo o espaçamento do parágrafo (p) para que fique no topo e pequeno */
         .browser-frame p { 
-            margin-top: 0; /* Remove o espaço superior indesejado */
-            margin-bottom: 15px; /* Mantém um pequeno espaço antes da barra de busca */
+            margin-top: 0; 
+            margin-bottom: 15px; 
+            font-size: 1.2em; /* Garante que o texto pequeno se destaque um pouco */
         }
         .address-bar {
             display: flex;
