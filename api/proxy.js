@@ -1,90 +1,52 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title> </title> <link rel="icon" type="image/png" href="/favicon.png"> 
+// api/proxy.js
+const { createProxyMiddleware } = require('http-proxy-middleware');
 
-    <style>
-        body {
-            /* LINK SVG CORRIGIDO E AGORA POSICIONADO 10% PARA CIMA: */
-            background-image: url('https://raw.githubusercontent.com/scratchernotfounded/Browser_Grifenix/main/Background.svg?raw=true'); 
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            background-position: center top 10%; /* Move o fundo para cima */
-            
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            font-family: 'Arial', sans-serif;
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
-        }
-        .browser-frame {
-            background-color: rgba(10, 10, 10, 0.9);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
-            width: 90%;
-            max-width: 600px;
-            text-align: center;
-        }
-        /* Corrigindo o espaçamento do parágrafo (p) para que fique no topo e pequeno */
-        .browser-frame p { 
-            margin-top: 0; 
-            margin-bottom: 15px; 
-            font-size: 1.2em; /* Garante que o texto pequeno se destaque um pouco */
-        }
-        .address-bar {
-            display: flex;
-            margin-top: 15px;
-        }
-        input[type="text"] {
-            flex-grow: 1;
-            padding: 12px;
-            border: 2px solid #555;
-            border-radius: 8px 0 0 8px;
-            font-size: 1em;
-            background-color: #333;
-            color: white;
-        }
-        button {
-            padding: 12px 20px;
-            border: none;
-            border-radius: 0 8px 8px 0;
-            background-color: #007bff;
-            color: white;
-            cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 1em;
-        }
-        button:hover {
-            background-color: #0056b3;
-        }
-    </style>
-</head>
-<body>
-    <div class="browser-frame">
-        <p>Acesso Seguro e Criptografado (Sem Bloqueios de Escola)</p> 
+module.exports = async (req, res) => {
+    // 1. Remove o caminho /api/proxy/ do início para isolar o link limpo (ex: example.com)
+    // Usamos regex para garantir que funcione corretamente, ignorando o / inicial.
+    let targetPath = req.url.replace(/^\/api\/proxy\//, ''); 
+
+    if (!targetPath) {
+        res.writeHead(400, { 'Content-Type': 'text/plain' });
+        res.end('URL de destino não fornecida.');
+        return;
+    }
+
+    // 2. Adiciona o protocolo HTTPS de volta (o que foi removido no cliente index.html)
+    // Isso é essencial para que a conexão externa funcione.
+    const targetUrl = `https://${targetPath}`; 
+
+    // 3. Configura o Proxy Middleware
+    const apiProxy = createProxyMiddleware({
+        target: targetUrl,
+        changeOrigin: true, // Essencial: usa o host do destino, não o do Vercel.
         
-        <div class="address-bar">
-            <input type="text" id="urlInput" placeholder="Digite a URL do jogo (ex: https://sitedojogo.com)">
-            <button onclick="acessar()">IR</button>
-        </div>
+        // Remove o /api/proxy/ do destino para que o site carregue corretamente
+        pathRewrite: { 
+            [`^/api/proxy/${targetPath}`]: '' 
+        }, 
+        
+        // Configurações para tentar resolver o timeout e erros de certificado do Vercel
+        secure: true, 
+        followRedirects: true,
+        rejectUnauthorized: false, 
 
-        <script>
-            function acessar() {
-                let url = document.getElementById('urlInput').value;
-                if (!url.startsWith('http://') && !url.startsWith('https://')) {
-                    url = 'https://' + url; 
-                }
-                
-                window.location.href = 'https://' + window.location.host + '/' + url;
+        onProxyReq: (proxyReq) => {
+            // Adiciona User-Agent e corrige o Host Header para evitar bloqueios 403
+            proxyReq.setHeader('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36');
+            try {
+                const targetHost = new URL(targetUrl).host;
+                proxyReq.setHeader('Host', targetHost);
+            } catch (e) {
+                // Ignora se a URL for malformada
             }
-        </script>
-    </div>
-</body>
-</html>
+        },
+        onError: (err, req, res) => {
+            // Mensagem de erro que aparecerá se o problema de conectividade do Vercel persistir
+            res.writeHead(500, { 'Content-Type': 'text/plain; charset=utf-8' });
+            res.end('Erro Crítico: Não foi possível conectar ao site de destino. Isso pode ser devido a bloqueio do Vercel.');
+        },
+    });
+
+    apiProxy(req, res);
+};
