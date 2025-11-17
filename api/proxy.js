@@ -1,39 +1,90 @@
-// api/proxy.js
-const { createProxyMiddleware } = require('http-proxy-middleware');
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> </title> <link rel="icon" type="image/png" href="/favicon.png"> 
 
-module.exports = async (req, res) => {
-  let targetUrl = req.url.substring(1); 
+    <style>
+        body {
+            /* LINK SVG CORRIGIDO E AGORA POSICIONADO 10% PARA CIMA: */
+            background-image: url('https://raw.githubusercontent.com/scratchernotfounded/Browser_Grifenix/main/Background.svg?raw=true'); 
+            background-size: cover;
+            background-repeat: no-repeat;
+            background-attachment: fixed;
+            background-position: center top 10%; /* Move o fundo para cima */
+            
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            color: white;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+        }
+        .browser-frame {
+            background-color: rgba(10, 10, 10, 0.9);
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 25px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            max-width: 600px;
+            text-align: center;
+        }
+        /* Corrigindo o espaçamento do parágrafo (p) para que fique no topo e pequeno */
+        .browser-frame p { 
+            margin-top: 0; 
+            margin-bottom: 15px; 
+            font-size: 1.2em; /* Garante que o texto pequeno se destaque um pouco */
+        }
+        .address-bar {
+            display: flex;
+            margin-top: 15px;
+        }
+        input[type="text"] {
+            flex-grow: 1;
+            padding: 12px;
+            border: 2px solid #555;
+            border-radius: 8px 0 0 8px;
+            font-size: 1em;
+            background-color: #333;
+            color: white;
+        }
+        button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 0 8px 8px 0;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            font-size: 1em;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="browser-frame">
+        <p>Acesso Seguro e Criptografado (Sem Bloqueios de Escola)</p> 
+        
+        <div class="address-bar">
+            <input type="text" id="urlInput" placeholder="Digite a URL do jogo (ex: https://sitedojogo.com)">
+            <button onclick="acessar()">IR</button>
+        </div>
 
-  if (!targetUrl || !targetUrl.startsWith('http')) {
-    res.writeHead(404, { 'Content-Type': 'text/plain' });
-    res.end('A URL de destino é inválida ou não foi fornecida (Ex: https://site.com).');
-    return;
-  }
-
-  const apiProxy = createProxyMiddleware({
-    // Definimos o target como uma URL base, o middleware lida com o resto
-    target: targetUrl, 
-    
-    // Isso é essencial: informa ao proxy para usar o host do destino, não o do Vercel
-    changeOrigin: true, 
-    
-    // Removemos a manipulação manual do Host Header, pois o changeOrigin deve ser suficiente:
-    // **REMOVIDO: onProxyReq: (proxyReq) => { ... proxyReq.setHeader('Host', targetHost); ... }**
-
-    pathRewrite: { '^/.*$': '' }, 
-    
-    // Configurações de conexão para máxima compatibilidade:
-    secure: true, 
-    followRedirects: true,
-    rejectUnauthorized: false, 
-
-    onProxyReq: (proxyReq) => {
-      // Configura User-Agent
-      proxyReq.setHeader('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/100.0.4896.127 Safari/537.36');
-    },
-    
-    // MANTEMOS O BLOCO ONERROR REMOVIDO PARA EVITAR MENSAGENS, FORÇANDO O TIMEOUT PADRÃO.
-  });
-
-  apiProxy(req, res);
-};
+        <script>
+            function acessar() {
+                let url = document.getElementById('urlInput').value;
+                if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                    url = 'https://' + url; 
+                }
+                
+                window.location.href = 'https://' + window.location.host + '/' + url;
+            }
+        </script>
+    </div>
+</body>
+</html>
