@@ -1,100 +1,176 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt-br">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Nova guia</title> 
-    <link rel="icon" type="image/png" href="/favicon.png"> 
-
+    <title>OS Grifenix Web Relay</title>
     <style>
-        body {
-            /* LINK SVG CORRIGIDO E AGORA POSICIONADO 20% PARA CIMA: */
-            background-image: url('https://raw.githubusercontent.com/scratchernotfounded/Browser_Grifenix/main/Background.svg?raw=true'); 
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-            background-position: center top 20%; 
-            
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        body, html {
             margin: 0;
-            font-family: 'Arial', sans-serif;
-            color: white;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+            padding: 0;
+            height: 100%;
+            overflow: hidden; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #0078d4; /* Cor clássica de desktop */
         }
-        .browser-frame {
-            background-color: rgba(10, 10, 10, 0);
-            padding: 30px;
-            border-radius: 15px;
-            box-shadow: 0 0 25px rgba(0, 0, 0, 0);
-            margin-top: 225px;
-            width: 90%;
-            max-width: 600px;
+        #desktop {
+            width: 100%;
+            height: 100%;
+            position: relative;
+        }
+        .app-icon {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            width: 80px;
             text-align: center;
-        }
-        /* Corrigindo o espaçamento do parágrafo (p) para que fique no topo e pequeno */
-        .browser-frame p { 
-            margin-top: 0; 
-            margin-bottom: 15px; 
-            font-size: 1.2em; 
-        }
-        .address-bar {
-            display: flex;
-            margin-top: 15px;
-        }
-        input[type="text"] {
-            flex-grow: 1;
-            padding: 12px;
-            border: 2px solid #555;
-            border-radius: 8px 0 0 8px;
-            font-size: 1em;
-            background-color: #00000000;
-            color: white;
-        }
-        button {
-            padding: 12px 20px;
-            border: 2px solid #555;
-            border-radius: 0 8px 8px 0;
-            background-color: #00000000;
             color: white;
             cursor: pointer;
-            transition: background-color 0.3s;
-            font-size: 1em;
+            text-shadow: 1px 1px 2px #000;
         }
-        button:hover {
-            background-color: #0056b3;
-            border: 2px solid #0056b3;
+        .app-icon img {
+            width: 48px;
+            height: 48px;
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 5px;
+            border-radius: 8px;
+            margin-bottom: 5px;
+        }
+
+        /* --- Estilos da Janela de Aplicativo --- */
+        .app-window {
+            position: absolute;
+            top: 100px;
+            left: 200px;
+            width: 80%;
+            height: 80%;
+            background-color: #f0f0f0;
+            border: 1px solid #aaa;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            overflow: hidden;
+            display: none; /* Inicia oculto */
+        }
+        .window-header {
+            background-color: #e0e0e0;
+            padding: 8px;
+            cursor: move;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+            border-bottom: 1px solid #ccc;
+        }
+        .window-title {
+            flex-grow: 1;
+        }
+        .window-close {
+            background: red;
+            color: white;
+            border: none;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            text-align: center;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .window-content {
+            height: calc(100% - 36px); /* Altura menos o header */
+        }
+        
+        /* --- Estilos Específicos do Navegador --- */
+        #browser-controls {
+            background-color: #e0e0e0;
+            padding: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            border-bottom: 1px solid #ccc;
+        }
+        #urlInput {
+            flex-grow: 1;
+            padding: 4px;
+            border: 1px solid #ccc;
+            border-radius: 3px;
+        }
+        #contentFrame {
+            width: 100%;
+            height: calc(100% - 35px); /* Altura ajustada */
+            border: none;
+        }
+        
+        /* --- Estilos Específicos do Explorador de Arquivos --- */
+        #files-list {
+            padding: 15px;
+            color: #333;
+            overflow-y: auto;
+        }
+        .file-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            cursor: pointer;
+        }
+        .file-item img {
+            width: 24px;
+            height: 24px;
+            margin-right: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="browser-frame">
-        <p>Acesso Seguro e Criptografado</p> 
+
+    <div id="desktop">
         
-        <div class="address-bar">
-            <input type="text" id="urlInput" placeholder="Digite a URL do jogo (ex: sitedojogo.com)">
-            <button onclick="acessar()">IR</button>
+        <div class="app-icon" onclick="openApp('browser')">
+            [attachment_0](attachment)
+            <span>Navegador Web</span>
         </div>
 
-        <script>
-            function acessar() {
-                let url = document.getElementById('urlInput').value.trim();
+        <div class="app-icon" style="top: 120px;" onclick="openApp('files')">
+            [attachment_1](attachment)
+            <span>Arquivos</span>
+        </div>
+        
+        <div class="app-icon" style="top: 220px;" onclick="registerHost()">
+            [attachment_2](attachment)
+            <span id="hostButtonText">Tornar-se Hospedeiro</span>
+        </div>
+        
+        <div id="browser-window" class="app-window">
+            <div class="window-header">
+                <span class="window-title">Navegador Web - <span id="myID">ID: Conectando...</span></span>
+                <span id="status">Status: Desconectado</span>
+                <button class="window-close" onclick="closeApp('browser')">X</button>
+            </div>
+            <div class="window-content">
+                <div id="browser-controls">
+                    <input type="text" id="urlInput" placeholder="https://site.com" autocomplete="off">
+                    <button onclick="acessar()">Acessar</button>
+                </div>
+                <iframe id="contentFrame" srcdoc="<h1>Bem-vindo ao Navegador Grifenix.</h1><p>Digite uma URL e clique em Acessar. Você precisará que outro usuário ative o modo Hospedeiro.</p>"></iframe>
+            </div>
+        </div>
 
-                if (!url) return;
-                
-                // --- CORREÇÃO DE BUG CRÍTICO: REMOVENDO O PROTOCOLO ---
-                // Remove 'https://' ou 'http://' para evitar o erro de barra dupla no path do Vercel.
-                const cleanedUrl = url.replace(/^https?:\/\//, ''); 
-                
-                // O caminho agora aponta diretamente para a função Serverless:
-                // Ex: /api/proxy/sitedojogo.com
-                window.location.href = '/api/proxy/' + cleanedUrl;
-                
-                // Nota: O servidor (api/proxy.js) é quem deve adicionar o 'https://' de volta.
-            }
-        </script>
+        <div id="files-window" class="app-window" style="left: 50px; top: 50px;">
+            <div class="window-header">
+                <span class="window-title">Explorador de Arquivos</span>
+                <button class="window-close" onclick="closeApp('files')">X</button>
+            </div>
+            <div id="files-content" class="window-content">
+                <div id="files-list">
+                    <h2>Downloads e Dispositivos</h2>
+                    <p>Conecte um dispositivo ou baixe um arquivo para começar a usar.</p>
+                </div>
+            </div>
+        </div>
+
     </div>
+    
+    <script>
+        // O código JavaScript (Lógica de App e WebSockets) será adicionado aqui
+    </script>
+
 </body>
 </html>
